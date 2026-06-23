@@ -1,0 +1,42 @@
+name: Virtual Company Simulation
+
+on:
+  schedule:
+    - cron: "0 15,19,23,3,7,11 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  simulate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Run simulation
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_MODEL_NORMAL: ${{ vars.OPENAI_MODEL_NORMAL }}
+          OPENAI_MODEL_IMPORTANT: ${{ vars.OPENAI_MODEL_IMPORTANT }}
+        run: |
+          python scripts/run_simulation.py
+
+      - name: Commit changes
+        run: |
+          git config user.name "virtual-company-bot"
+          git config user.email "actions@github.com"
+          git add data logs
+          git commit -m "Update virtual company simulation" || echo "No changes to commit"
+          git push
