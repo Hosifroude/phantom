@@ -10,3 +10,7 @@
 
 - 2026-06-26 00:55：legal_form_decision_preparation - 
 - 2026-06-26 00:55：workflow_ready - 
+
+- 2026-06-26 02:03：decision_progress - 合同会社を正式方針として採用する準備を進めた。
+- 2026-06-26 02:03：process_design - 相談予約獲得向けの返信テンプレートと予約フローの草案を整備した。
+- 2026-06-26 02:03：automation_preparation - 自動返信と社内通知の簡易自動化を試作した。
