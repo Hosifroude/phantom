@@ -59,7 +59,7 @@ def build_prompt(state: dict, now) -> tuple[str, bool]:
         "# AI入力用current_state.md\n" + state["current_state_md"],
         "# 直近ログ（最大3件）\n" + recent_logs(),
         "# 構造化入力\n```json\n" + json.dumps(payload, ensure_ascii=False, indent=2) + "\n```",
-        "# 出力形式\n通常ターンJSON形式で返すこと。turn, employees, company_effects, events, important_event, next_company_focusを含めること。",
+        "# 出力形式\n通常ターンJSON形式で返すこと。turn, employees, company_effects, events, important_event, next_company_focusを含めること。各社員にはhours_usedとeffects.fatigue_delta/effects.motivation_deltaを必ず入れ、status_changeは使わないこと。",
     ])
     return prompt, important
 
