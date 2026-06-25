@@ -5,6 +5,7 @@ from datetime import datetime
 from pathlib import Path
 from state_loader import EMPLOYEE_FILES
 from utils import ROOT, JST, clamp, int_to_yen, read, replace_bullet, write
+from dashboard_writer import write_dashboard
 
 
 def phase_info(company: dict, now) -> tuple[str, int]:
@@ -98,6 +99,7 @@ def write_state(updated: dict, now) -> Path:
     write(ROOT / "data/current_state.md", current)
     log_path = write_log(updated, now, current)
     append_events(updated, now)
+    write_dashboard(updated, now, log_path)
     return log_path
 
 
