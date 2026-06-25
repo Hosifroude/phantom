@@ -1,5 +1,21 @@
 # ファントム仮想企業シミュレーション
 
+## 現在状況
+
+- [ダッシュボード](./DASHBOARD.md)
+- [HTML版ダッシュボード](./docs/index.html)
+- [現在状態](./data/current_state.md)
+- [実行ログ](./logs/)
+
+## ダッシュボードの公開方針
+
+このリポジトリはprivate運用を前提にしています。
+`DASHBOARD.md` と `docs/index.html` は、privateリポジトリ内で自分だけ確認するためのものです。
+
+現時点ではGitHub Pages公開は行いません。
+将来、公開または限定公開が必要になった場合のみ、GitHub Pagesの利用を検討します。
+
+
 このリポジトリは、GitHub上のMarkdownファイルを会社の記憶・台帳として使い、GitHub ActionsとOpenAI APIで仮想企業「ファントム」を自動進行させるMVPです。PCの電源が落ちていても、GitHub Actionsが4時間ごとに社員3人分の行動をAIに決めさせ、状態と履歴をMarkdownへ保存します。
 
 ## シミュレーション概要
