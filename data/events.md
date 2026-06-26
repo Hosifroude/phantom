@@ -30,3 +30,6 @@
 
 - 2026-06-27 01:55：legal_form_decision_preparation - 
 - 2026-06-27 01:55：service_description_finalization_preparation - 
+
+- 2026-06-27 05:26：decision_preparation_completed - 
+- 2026-06-27 05:26：consultation_pipeline_ready - 
