@@ -25,3 +25,5 @@
 
 - 2026-06-26 19:13：legal_form_decision_preconfirmation - 
 - 2026-06-26 19:13：consultation_pipeline_ready - 
+
+- 2026-06-26 22:02：consultation_pipeline_ready - 問い合わせ案内、初回相談誘導、ヒアリング項目、返信テンプレート、簡易運用基盤を整備し、試運用開始の準備が完了した。
