@@ -22,3 +22,6 @@
 
 - 2026-06-26 15:42：legal_form_decision - 法人形態は合同会社で進める代表判断が確定した。
 - 2026-06-26 15:42：prelaunch_readiness_update - 起業日イベントで即実行できる資金移動・運用ルール草案が完成し、相談予約試運転の準備が整った。
+
+- 2026-06-26 19:13：legal_form_decision_preconfirmation - 
+- 2026-06-26 19:13：consultation_pipeline_ready - 
