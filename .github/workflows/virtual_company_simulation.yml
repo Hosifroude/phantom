@@ -2,7 +2,7 @@ name: Virtual Company Simulation
 
 on:
   schedule:
-    - cron: "0 15,19,23,3,7,11 * * *"
+    - cron: '17 15,19,23,3,7,11 * * *'
   workflow_dispatch:
 
 permissions:
