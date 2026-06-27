@@ -43,3 +43,8 @@
 - 2026-06-28 01:33：legal_form_decision_preparation - {'legal_form': '合同会社', 'legal_name': 'ファントム合同会社'}
 - 2026-06-28 01:33：personal_fund_to_company_preparation - {'planned_transfer_amount': 300000, 'planned_source': '代表の個人資金', 'planned_use': '登記、初期運転費、営業準備、予備費'}
 - 2026-06-28 01:33：consultation_booking_readiness - {'status': 'trial_ready'}
+
+- 2026-06-28 05:33：legal_form_decision_prepared - 
+- 2026-06-28 05:33：company_name_finalization_prepared - 
+- 2026-06-28 05:33：personal_fund_to_company_preparation - 
+- 2026-06-28 05:33：consultation_booking_pipeline_ready - 
