@@ -94,10 +94,11 @@ GitHubの **Actions** タブで `Virtual Company Simulation` を選び、**Run w
 
 ## 自動実行
 
-GitHub ActionsはUTC基準のcronで、日本時間 0:00 / 4:00 / 8:00 / 12:00 / 16:00 / 20:00 に対応します。
+GitHub ActionsはUTC基準のcronで、日本時間 00:17 / 04:17 / 08:17 / 12:17 / 16:17 / 20:17 に対応します。
+GitHub ActionsのscheduleはUTC基準で、実行は数分遅れる場合があります。
 
 ```yaml
-cron: "0 15,19,23,3,7,11 * * *"
+cron: '17 15,19,23,3,7,11 * * *'
 ```
 
 ## コスト節約設計
