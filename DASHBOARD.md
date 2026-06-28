@@ -44,9 +44,9 @@
 <details>
 <summary>社員詳細</summary>
 
-- [佐藤 直樹](./data/employees/001_ceo.md)：前回行動「なし」 / 現在タスク「なし」
-- [高橋 美咲](./data/employees/002_ai_flow_designer.md)：前回行動「なし」 / 現在タスク「なし」
-- [田中 蓮](./data/employees/003_automation_engineer.md)：前回行動「なし」 / 現在タスク「なし」
+- [佐藤 直樹](./data/employees/001_ceo.md) / [行動履歴](./docs/employees/001.html)：前回行動「なし」 / 現在タスク「なし」
+- [高橋 美咲](./data/employees/002_ai_flow_designer.md) / [行動履歴](./docs/employees/002.html)：前回行動「なし」 / 現在タスク「なし」
+- [田中 蓮](./data/employees/003_automation_engineer.md) / [行動履歴](./docs/employees/003.html)：前回行動「なし」 / 現在タスク「なし」
 
 </details>
 
