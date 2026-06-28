@@ -48,3 +48,6 @@
 - 2026-06-28 05:33：company_name_finalization_prepared - 
 - 2026-06-28 05:33：personal_fund_to_company_preparation - 
 - 2026-06-28 05:33：consultation_booking_pipeline_ready - 
+
+- 2026-06-28 09:15：法人形態と正式名称を代表決定 - 
+- 2026-06-28 09:15：相談予約導線の試運転準備 - 
