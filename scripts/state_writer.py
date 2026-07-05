@@ -15,7 +15,54 @@ def phase_info(company: dict, now) -> tuple[str, int]:
         return "起業前", days
     if days == 0:
         return "起業日", 0
-    return "起業後", days
+    return "起業後", abs(days)
+
+
+def launch_days_text(phase: str, days: int) -> str:
+    if phase == "起業後":
+        return f"起業後{days}日"
+    if phase == "起業日":
+        return "起業日"
+    return f"{days}日"
+
+
+def action_description(action: dict) -> str:
+    actions = action.get("actions")
+    if isinstance(actions, list) and actions:
+        parts = []
+        for item in actions:
+            if not isinstance(item, dict):
+                continue
+            name = str(item.get("name") or "").strip()
+            details = str(item.get("details") or item.get("description") or item.get("outcome") or "").strip()
+            text = "：".join(part for part in [name, details] if part)
+            if text:
+                parts.append(text)
+        if parts:
+            return " / ".join(parts)
+    return str(action.get("title") or action.get("description") or action.get("name") or "")
+
+
+def apply_legal_decision(company: dict, ai: dict) -> None:
+    candidates = []
+    important = ai.get("important_event")
+    if isinstance(important, dict):
+        candidates.append(important)
+    candidates.extend(event for event in ai.get("events", []) if isinstance(event, dict))
+
+    for event in candidates:
+        decision = event.get("decision") if isinstance(event.get("decision"), dict) else {}
+        text = " ".join(str(event.get(key, "")) for key in ("type", "title", "summary", "details", "reason"))
+        legal_name = decision.get("legal_name")
+        legal_form = decision.get("legal_form")
+        if not legal_name and "合同会社ファントム" in text:
+            legal_name = "合同会社ファントム"
+        if not legal_form and ("合同会社" in text or (isinstance(legal_name, str) and legal_name.startswith("合同会社"))):
+            legal_form = "合同会社"
+        if legal_name:
+            company["legal_name"] = legal_name
+        if legal_form:
+            company["legal_form"] = legal_form
 
 
 def apply_turn(state: dict, ai: dict, now) -> dict:
@@ -44,8 +91,10 @@ def apply_turn(state: dict, ai: dict, now) -> dict:
         emp["motivation"] = clamp(emp["motivation"] + effects.get("motivation_delta", 0), 0, 100)
         emp["cash_on_hand"] = max(0, emp["cash_on_hand"] + effects.get("cash_delta", 0))
         emp["bank_balance"] = max(0, emp["bank_balance"] + effects.get("bank_balance_delta", 0))
-        emp["last_action"] = action.get("title", "")
+        emp["last_action"] = action_description(action)
         emp["current_task"] = action.get("next_hint", "")
+
+    apply_legal_decision(company, ai)
 
     for event in ai.get("events", []):
         if event.get("type") == "legal_form_decision":
@@ -82,7 +131,7 @@ def write_state(updated: dict, now) -> Path:
     content = read(cpath)
     for label, value in [
         ("正式名称", company["legal_name"]), ("法人形態", company["legal_form"]), ("フェーズ", phase),
-        ("現在日", now.strftime("%Y-%m-%d")), ("起業日まで", f"{days}日"), ("会社資金", int_to_yen(company["company_cash"])),
+        ("現在日", now.strftime("%Y-%m-%d")), ("起業日まで", launch_days_text(phase, days)), ("会社資金", int_to_yen(company["company_cash"])),
         ("起業準備金", int_to_yen(company["preparation_fund"])), ("今月売上", int_to_yen(company["monthly_sales"])),
         ("今月費用", int_to_yen(company["monthly_expense"])), ("評判", str(company["reputation"])),
     ]:
@@ -105,7 +154,7 @@ def write_state(updated: dict, now) -> Path:
 
 def render_current_state(updated: dict, now) -> str:
     c = updated["company"]
-    lines = ["# 現在状態", "", "## 現在日時", "", f"- 現在日時：{now:%Y-%m-%d %H:%M} JST", f"- フェーズ：{c['phase']}", f"- 起業日まで：{c['days_until_launch']}日", "", "## 会社基本情報", "", f"- 会社名：ファントム", f"- 正式名称：{c['legal_name']}", f"- 法人形態：{c['legal_form']}", f"- 評判：{c['reputation']}", "", "## 会社資金", "", f"- 会社資金：{int_to_yen(c['company_cash'])}", f"- 起業準備金：{int_to_yen(c['preparation_fund'])}", f"- 今月売上：{int_to_yen(c['monthly_sales'])}", f"- 今月費用：{int_to_yen(c['monthly_expense'])}", "", "## 案件状況", "", "- 進行中案件：data/projects.mdを参照", "- 緊急課題：法人形態、営業準備、初期サービス設計", "", "## 社員状態", ""]
+    lines = ["# 現在状態", "", "## 現在日時", "", f"- 現在日時：{now:%Y-%m-%d %H:%M} JST", f"- フェーズ：{c['phase']}", f"- 起業日まで：{launch_days_text(c['phase'], c['days_until_launch'])}", "", "## 会社基本情報", "", f"- 会社名：ファントム", f"- 正式名称：{c['legal_name']}", f"- 法人形態：{c['legal_form']}", f"- 評判：{c['reputation']}", "", "## 会社資金", "", f"- 会社資金：{int_to_yen(c['company_cash'])}", f"- 起業準備金：{int_to_yen(c['preparation_fund'])}", f"- 今月売上：{int_to_yen(c['monthly_sales'])}", f"- 今月費用：{int_to_yen(c['monthly_expense'])}", "", "## 案件状況", "", "- 進行中案件：data/projects.mdを参照", "- 緊急課題：法人形態、営業準備、初期サービス設計", "", "## 社員状態", ""]
     for e in updated["employees"]:
         lines.append(f"- {e['id']} {e['name']}：{e['age']}歳 / 疲労{e['fatigue']} / 意欲{e['motivation']} / 所持金{int_to_yen(e['cash_on_hand'])} / 預金{int_to_yen(e['bank_balance'])}")
     lines += ["", "## 直近の流れ", "", f"- {updated['ai'].get('turn', {}).get('summary', 'AIターンを実行')}", "", "## 次の注力事項", "", f"- {updated['ai'].get('next_company_focus', '次回ターンで起業準備を継続する')}"]

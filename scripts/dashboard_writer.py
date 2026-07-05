@@ -24,15 +24,19 @@ def _latest_log_path() -> Path | None:
 def _action_lines(ai: dict[str, Any], limit: int = 5) -> list[str]:
     lines: list[str] = []
     for employee in ai.get("employees", []):
-        name = employee.get("name") or employee.get("employee_name") or employee.get("id", "社員")
+        employee_name = employee.get("name") or employee.get("employee_name") or employee.get("id", "社員")
         actions = employee.get("actions") or [employee]
         action_texts = []
         for action in actions:
-            text = action.get("outcome") or action.get("description") or action.get("title")
+            if not isinstance(action, dict):
+                continue
+            action_name = str(action.get("name") or "").strip()
+            details = str(action.get("details") or action.get("description") or action.get("outcome") or "").strip()
+            text = "：".join(part for part in [action_name, details] if part) or action.get("title")
             if text:
                 action_texts.append(text)
         if action_texts:
-            lines.append(f"{name}：{action_texts[0]}")
+            lines.append(f"{employee_name}：{action_texts[0]}")
     if not lines:
         summary = ai.get("turn", {}).get("summary")
         if summary and summary != "AIターンを実行":
@@ -112,7 +116,9 @@ def _employee_action_history() -> dict[str, list[dict[str, str]]]:
             for action in actions:
                 if not isinstance(action, dict):
                     continue
-                description = action.get("description") or action.get("title") or action.get("type") or "行動内容なし"
+                name = str(action.get("name") or "").strip()
+                details = str(action.get("details") or action.get("description") or action.get("outcome") or "").strip()
+                description = "：".join(part for part in [name, details] if part) or action.get("title") or action.get("type") or "行動内容なし"
                 outcome = action.get("outcome") or action.get("result") or "成果の記録なし"
                 history.setdefault(emp_id, []).append({
                     "executed_at": executed_at.strftime("%Y-%m-%d %H:%M JST"),
@@ -183,7 +189,19 @@ def _company_details(updated: dict[str, Any] | None) -> dict[str, Any]:
 
 
 def _days_text(value: Any) -> str:
-    return f"{value}日" if isinstance(value, int) else str(value)
+    if isinstance(value, int):
+        return f"起業後{abs(value)}日" if value < 0 else f"{value}日"
+    text = str(value)
+    match = re.fullmatch(r"-(\d+)日?", text)
+    return f"起業後{match.group(1)}日" if match else text
+
+
+def _focus_warning(focus: str, company_cash_text: str) -> str:
+    cash = int(re.sub(r"\D", "", company_cash_text) or 0)
+    amounts = [int(m.replace(",", "")) for m in re.findall(r"(\d{1,3}(?:,\d{3})+)円", focus)]
+    if cash and any(amount != cash for amount in amounts):
+        return f"（注意：現在の会社資金は{company_cash_text}です。注力事項内の金額表現と矛盾する可能性があります）"
+    return ""
 
 
 def write_dashboard(updated: dict[str, Any] | None = None, now: datetime | None = None, log_path: Path | None = None) -> None:
@@ -197,6 +215,9 @@ def write_dashboard(updated: dict[str, Any] | None = None, now: datetime | None 
     focus_value = ai.get("next_company_focus") or _bullet(read(ROOT / "data/current_state.md"), "次の注力事項", "起業準備を継続する")
     focus_items = focus_value if isinstance(focus_value, list) else [str(focus_value)]
     focus = " / ".join(str(item) for item in focus_items if str(item).strip()) or "起業準備を継続する"
+    focus_warning = _focus_warning(focus, company["company_cash"])
+    if focus_warning:
+        focus = f"{focus} {focus_warning}"
     log_rel = log_path.relative_to(ROOT).as_posix() if log_path else "logs/"
     latest_log = read(log_path) if log_path else ""
     ai_json = json.dumps(ai, ensure_ascii=False, indent=2) if ai else "最新AI出力はまだありません。"

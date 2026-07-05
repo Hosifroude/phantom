@@ -86,3 +86,35 @@ def test_nonzero_effects_take_priority_and_hours_are_clamped():
     assert emp["effects"]["fatigue_delta"] == 3
     assert emp["effects"]["motivation_delta"] == -1
     assert emp["hours_used"] == 4.0
+
+
+def test_actions_name_and_details_are_used_for_last_action():
+    ai = validate_and_normalize(_ai(_employee("001", actions=[{"name": "法人形態確認", "details": "合同会社ファントムで進める"}])))
+    updated = apply_turn(_state(), ai, datetime(2026, 7, 5, tzinfo=timezone.utc))
+    updated_emp = next(e for e in updated["employees"] if e["id"] == "001")
+    assert updated_emp["last_action"] == "法人形態確認：合同会社ファントムで進める"
+
+
+def test_post_launch_days_are_positive_elapsed_days():
+    updated = apply_turn(_state(), validate_and_normalize(_ai(_employee("001"))), datetime(2026, 7, 5, tzinfo=timezone.utc))
+    assert updated["company"]["phase"] == "起業後"
+    assert updated["company"]["days_until_launch"] == 5
+
+
+def test_decision_event_updates_legal_identity():
+    ai = _ai(_employee("001"))
+    ai["events"] = [{"type": "decision_event", "title": "合同会社ファントムの法人形態・正式名称の最終整理"}]
+    updated = apply_turn(_state(), validate_and_normalize(ai), datetime(2026, 7, 5, tzinfo=timezone.utc))
+    assert updated["company"]["legal_name"] == "合同会社ファントム"
+    assert updated["company"]["legal_form"] == "合同会社"
+
+
+def test_company_cash_delta_does_not_increase_monthly_expense():
+    state = _state()
+    state["company"]["company_cash"] = 1000
+    state["company"]["monthly_expense"] = 598000
+    ai = _ai(_employee("001"))
+    ai["company_effects"] = {"company_cash_delta": -500, "monthly_expense_delta": 0}
+    updated = apply_turn(state, validate_and_normalize(ai), datetime(2026, 7, 5, tzinfo=timezone.utc))
+    assert updated["company"]["company_cash"] == 500
+    assert updated["company"]["monthly_expense"] == 598000
